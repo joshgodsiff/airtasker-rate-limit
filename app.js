@@ -1,6 +1,6 @@
 import express from 'express';
 import { InMemoryStore } from './store/InMemory.js'
-import { TokenBucketRateLimiter } from './strategy/TokenBucket.js'
+import { TokenBucketRateLimiter } from './strategy/index.js'
 import { RateLimiter } from './RateLimiter.js';
 
 const app = express();

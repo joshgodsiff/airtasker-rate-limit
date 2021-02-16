@@ -1,9 +1,12 @@
-function tokensAvailable(limit, window, currentValue) {
-  const now = new Date();
+function _tokensAvailable({time, limit, window, currentValue}) {
+  // Divide by 0 check
+  if (limit === 0 || time.getTime() === currentValue.timestamp.getTime()) {
+    return currentValue.tokens;
+  }
 
   const slice = window / limit; // The time value of one "token";
 
-  const timeDiff = now.getTime() - currentValue.timestamp.getTime();
+  const timeDiff = time.getTime() - currentValue.timestamp.getTime();
   const slicesInDiff = Math.floor(timeDiff / slice);
 
   if (slicesInDiff > limit) {
@@ -15,40 +18,52 @@ function tokensAvailable(limit, window, currentValue) {
   }
 }
 
-function value(tokens) {
+function _value({timestamp, tokens}) {
   return {
-    timestamp: new Date(), // Now
+    timestamp,
     tokens
   }
 }
 
-function defaultValue(limit) {
-  return {
-    timestamp: new Date(0),
-    tokens: limit
-  }
+function _rateLimiter({store, limit, window, id}) {
+  return store.transaction((t) => {
+    if (t.has(id)) {
+      const currentValue = t.get(id);
+      const tokens = tokensAvailable({limit, window, currentValue});
+
+      if (tokens) {
+        // the '-1' is for this request
+        t.set(id, value(tokens - 1))
+      }
+
+      return tokens <= 0;
+    } else {
+      t.set(id, value(limit - 1));
+      return limit <= 0;
+    }
+  });
 }
+
+// ----------------------------------------------------------------------------
 
 function rateLimiter(store, limit, window) {
   return function(id) {
-    return store.transaction((t) => {
-      if (t.has(id)) {
-        const currentValue = t.get(id);
-        const tokens = tokensAvailable(limit, window, currentValue);
-
-        console.log(currentValue, tokens);
-  
-        if (tokens) {
-          // the '-1' is for this request
-          t.set(id, value(tokens - 1))
-        }
-  
-        return tokens <= 0;
-      } else {
-        t.set(id, defaultValue(limit));
-      }
-    });
+    return _rateLimiter({store, limit, window, id})
   }
 }
 
-export { rateLimiter as TokenBucketRateLimiter }
+function value(tokens) {
+  return _value({timestamp: new Date(), tokens})
+}
+
+function tokensAvailable({limit, window, currentValue}) {
+  return _tokensAvailable({time: new Date(), limit, window, currentValue});
+}
+
+export {
+  rateLimiter as TokenBucketRateLimiter,
+  tokensAvailable,
+  _tokensAvailable,
+  value,
+  _value
+}
