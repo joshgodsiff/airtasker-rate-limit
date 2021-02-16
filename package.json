@@ -1,5 +1,6 @@
 {
   "name": "airtasker-rate-limit",
+  "type": "module",
   "version": "1.0.0",
   "description": "Airtasker Rate Limiting Challenge",
   "main": "index.js",
@@ -7,5 +8,11 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "scripts": {
+    "dev": "nodemon app.js"
   }
 }
