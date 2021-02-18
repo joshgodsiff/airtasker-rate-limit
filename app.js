@@ -1,15 +1,16 @@
 import express from 'express';
-import { InMemoryStore } from './InMemory.js'
-import { TokenBucketRateLimiter } from './TokenBucket.js'
+import { InMemoryStore } from './InMemory.js';
+import { RedisStore } from './Redis.js';
+import { TokenBucketStrategy } from './TokenBucket.js';
 import { RateLimiter } from './RateLimiter.js';
-import { SlidingLogRateLimiter } from './SlidingLog.js';
+import { SlidingLogStrategy } from './SlidingLog.js';
 
 const app = express();
 const port = 8000;
 
 const tenSeconds = new Date(0).setUTCSeconds(10); // Careful, this is a number, not a Date object.
 
-const limiter = RateLimiter({store: InMemoryStore, strategy: SlidingLogRateLimiter, limit: 5, window: tenSeconds});
+const limiter = RateLimiter({store: InMemoryStore(), strategy: TokenBucketStrategy, limit: 5, window: tenSeconds});
 
 app.get('/', (req, res) => {
   const onLimit = () => {
@@ -21,7 +22,7 @@ app.get('/', (req, res) => {
     res.send("Success");
   }
 
-  limiter.rateLimit({idFunc: () => "Fake ID", onLimit, onSuccess })
+  limiter.rateLimitWithCb({idFunc: () => "Fake ID", onLimit, onSuccess })
 });
 
 app.listen(port, () => {

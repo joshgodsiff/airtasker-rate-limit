@@ -1,21 +1,26 @@
 import Queue from 'queue-fifo';
 
-function withinWindow({time, window, logEntry}) {
+function _withinWindow({time, window, logEntry}) {
   return time.getTime() - logEntry.getTime() < window;
 }
 
-function cleanupOldEntries({time, window, log}) {
-  while (!log.isEmpty() && !withinWindow({time, window, logEntry: log.peek()})) {
+function _cleanupOldEntries({time, window, log}) {
+  while (!log.isEmpty() && !_withinWindow({time, window, logEntry: log.peek()})) {
     log.dequeue();
   }
 
   return log;
 }
 
+export { // Exported for testing purposes
+  _withinWindow,
+  _cleanupOldEntries
+}
+
 // Public ---------------------------------------------------------------------
 
 const SlidingLogStrategy = {
-  getUpToDateValue: ({time, window, value}) => cleanupOldEntries({time, window, log: value}),
+  getUpToDateValue: ({time, window, value}) => _cleanupOldEntries({time, window, log: value}),
   hasSpareCapacity: ({upToDateValue, limit}) => upToDateValue.size() < limit,
   nextValueOnSuccess: ({upToDateValue, timestamp}) => {
     upToDateValue.enqueue(timestamp)
@@ -40,13 +45,6 @@ const SlidingLogStrategy = {
   }
 }
 
-function rateLimiter(store, limit, window) {
-  return function(id) {
-    return _rateLimiter({store, limit, window, id})
-  }
-}
-
 export {
-  rateLimiter as SlidingLogRateLimiter,
   SlidingLogStrategy
 }

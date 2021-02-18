@@ -1,6 +1,3 @@
-const noop = () => {};
-const defaults = {onLimit: noop, onSuccess: noop}
-
 async function genericRateLimiter({store, strategy, limit, window, id}) {
   const now = new Date();
 
@@ -29,6 +26,15 @@ async function genericRateLimiter({store, strategy, limit, window, id}) {
 }
 
 function curriedRateLimiter({store, strategy, limit, window}) {
+  return function(id) {
+    return genericRateLimiter({store, strategy, limit, window, id});
+  }
+}
+
+const noop = () => {};
+const defaults = {onLimit: noop, onSuccess: noop}
+
+function rateLimiterWithCb({store, strategy, limit, window}) {
   return async function(args) {
     const {id, onLimit, onSuccess} = {...defaults, ...args};
 
@@ -49,7 +55,8 @@ function curriedRateLimiter({store, strategy, limit, window}) {
 function RateLimiter({store, strategy, limit, window}) {
   return {
     // rateLimit: rateLimit(strategy(store(), limit, window))
-    rateLimit: curriedRateLimiter({store, strategy, limit, window})
+    rateLimit: curriedRateLimiter({store, strategy, limit, window}),
+    rateLimitWithCb: rateLimiterWithCb({store, strategy, limit, window})
   }
 }
 

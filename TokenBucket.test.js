@@ -1,6 +1,5 @@
-import { 
-  TokenBucketRateLimiter, 
-  _tokensAvailable, 
+import {
+  _tokensAvailable,
   _token
 } from './TokenBucket.js';
 

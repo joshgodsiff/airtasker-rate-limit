@@ -53,6 +53,5 @@ function rateLimiter(store, limit, window) {
 }
 
 export {
-  rateLimiter as TokenBucketRateLimiter,
   TokenBucketStrategy
 }
