@@ -7,11 +7,12 @@
   "author": "Josh Godsiff",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "queue-fifo": "^0.2.6"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7",
-    "mocha": "^8.3.0"
+    "mocha": "^8.3.0",
+    "nodemon": "^2.0.7"
   },
   "scripts": {
     "dev": "nodemon app.js",

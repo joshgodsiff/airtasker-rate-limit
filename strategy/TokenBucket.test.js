@@ -53,7 +53,7 @@ describe("TokenBucket", () => {
     })
   })
 
-  describe("Token Bucket rate limiting strategy", () => {
+  describe("rate limiting strategy", () => {
     it("should not rate limit if this is the first request", () => {
       const window = new Date(0).setUTCMinutes(1);
       const id = "Does not exist";
@@ -105,7 +105,7 @@ describe("TokenBucket", () => {
       assert.strictEqual(call3, false);
       assert.strictEqual(call4, true);
 
-      await new Promise(r => setTimeout(r, 1000)); 
+      await new Promise(r => setTimeout(r, window));
 
       const call5 = TokenBucketRateLimiter(store, limit, window)(id);
       assert.strictEqual(call5, false);

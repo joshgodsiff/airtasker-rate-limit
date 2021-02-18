@@ -1,11 +1,7 @@
-function RateLimiter({store, strategy, limit, window}) {
-  return {
-    rateLimit: rateLimit(strategy(store(), limit, window))
-  }
-}
+const noop = () => {};
 
 function rateLimit(limiter) {
-  return function({idFunc, onLimit, onSuccess}) {
+  return function({idFunc, onLimit, onSuccess} = {onLimit: noop, onSuccess: noop}) {
     const id = idFunc();
     const isRateLimited = limiter(id);
   
@@ -14,6 +10,16 @@ function rateLimit(limiter) {
     } else {
       onSuccess();
     }
+
+    return isRateLimited;
+  }
+}
+
+// Public ---------------------------------------------------------------------
+
+function RateLimiter({store, strategy, limit, window}) {
+  return {
+    rateLimit: rateLimit(strategy(store(), limit, window))
   }
 }
 

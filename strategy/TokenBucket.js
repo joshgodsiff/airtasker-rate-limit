@@ -31,7 +31,7 @@ function _rateLimiter({store, limit, window, id}) {
       const currentValue = t.get(id);
       const tokens = tokensAvailable({limit, window, currentValue});
 
-      if (tokens) {
+      if (tokens > 0) {
         // the '-1' is for this request
         t.set(id, value(tokens - 1))
       }
@@ -44,7 +44,12 @@ function _rateLimiter({store, limit, window, id}) {
   });
 }
 
-// ----------------------------------------------------------------------------
+export { // Exported for testing purposes.
+  _tokensAvailable,
+  _value
+}
+
+// Public ---------------------------------------------------------------------
 
 function rateLimiter(store, limit, window) {
   return function(id) {
@@ -63,7 +68,5 @@ function tokensAvailable({limit, window, currentValue}) {
 export {
   rateLimiter as TokenBucketRateLimiter,
   tokensAvailable,
-  _tokensAvailable,
   value,
-  _value
 }
