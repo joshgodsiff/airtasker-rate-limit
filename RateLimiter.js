@@ -1,25 +1,27 @@
 const noop = () => {};
 const defaults = {onLimit: noop, onSuccess: noop}
 
-function genericRateLimiter({store, strategy, limit, window, id}) {
+async function genericRateLimiter({store, strategy, limit, window, id}) {
   const now = new Date();
-  if (store.has(id)) {
-    const value = store.get(id);
+
+  if (await store.has(id)) {
+    const value = strategy.deserialize(await store.get(id));
 
     const upToDateValue = strategy.getUpToDateValue({time: now, limit, window, value})
     const hasSpareCapacity = strategy.hasSpareCapacity({upToDateValue, limit, window})
 
     if (hasSpareCapacity) {
       const newValue = strategy.nextValueOnSuccess({timestamp: now, upToDateValue})
-      store.set(id, newValue)
+      await store.set(id, strategy.serialize(newValue))
+
     } else if (strategy.shouldSetOnLimit) {
-      store.set(id, strategy.nextValueOnLimit({timestamp: now, upToDateValue, limit, window}))
+      await store.set(id, strategy.serialize(strategy.nextValueOnLimit({timestamp: now, upToDateValue, limit, window})))
     } // Else case deliberately omitted
 
     return !hasSpareCapacity;
   } else {
     if (limit > 0) {
-      store.set(id, strategy.freshValue({timestamp: now, limit, window}))
+      await store.set(id, strategy.serialize(strategy.freshValue({timestamp: now, limit, window})))
     }
 
     return limit <= 0;
@@ -27,11 +29,11 @@ function genericRateLimiter({store, strategy, limit, window, id}) {
 }
 
 function curriedRateLimiter({store, strategy, limit, window}) {
-  return function(args) {
+  return async function(args) {
     const {id, onLimit, onSuccess} = {...defaults, ...args};
 
-    const isRateLimited = genericRateLimiter({store, strategy, limit, window, id});
-  
+    const isRateLimited = await genericRateLimiter({store, strategy, limit, window, id});
+
     if (isRateLimited) {
       onLimit();
     } else {
@@ -47,7 +49,7 @@ function curriedRateLimiter({store, strategy, limit, window}) {
 function RateLimiter({store, strategy, limit, window}) {
   return {
     // rateLimit: rateLimit(strategy(store(), limit, window))
-    rateLimit: curriedRateLimiter({store: store(), strategy, limit, window})
+    rateLimit: curriedRateLimiter({store, strategy, limit, window})
   }
 }
 

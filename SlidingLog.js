@@ -27,6 +27,16 @@ const SlidingLogStrategy = {
     const q = new Queue();
     q.enqueue(timestamp);
     return q;
+  },
+  serialize: (queue) => {
+    const arr = queue._list.toArray();
+    return JSON.stringify(arr.map(date => date.getTime()))
+  },
+  deserialize: (string) => {
+    const parsed = JSON.parse(string)
+    const q = new Queue();
+    parsed.map(e => q.enqueue(new Date(e)))
+    return q;
   }
 }
 

@@ -37,8 +37,13 @@ const TokenBucketStrategy = {
   hasSpareCapacity: ({upToDateValue}) => upToDateValue > 0,
   nextValueOnSuccess: ({upToDateValue, timestamp}) => _token({timestamp, tokens: upToDateValue - 1}),
   shouldSetOnLimit: false,
-  nextValueOnLimit: () => {console.error("TokenBucketStrategy.nextValueOnLimit should never be called")},
-  freshValue: ({timestamp, limit}) => _token({timestamp, tokens: limit - 1})
+  nextValueOnLimit: () => {throw new Error("TokenBucketStrategy.nextValueOnLimit should never be called")},
+  freshValue: ({timestamp, limit}) => _token({timestamp, tokens: limit - 1}),
+  serialize: ({timestamp, tokens}) => JSON.stringify({timestamp: timestamp.getTime(), tokens}),
+  deserialize: (string) => {
+    const parsed = JSON.parse(string)
+    return _token({timestamp: new Date(parsed.timestamp), tokens: parsed.tokens})
+  }
 }
 
 function rateLimiter(store, limit, window) {
