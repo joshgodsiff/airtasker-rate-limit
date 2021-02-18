@@ -1,8 +1,8 @@
 import express from 'express';
-import { InMemoryStore } from './store/InMemory.js'
-import { TokenBucketRateLimiter } from './strategy/index.js'
+import { InMemoryStore } from './InMemory.js'
+import { TokenBucketRateLimiter } from './TokenBucket.js'
 import { RateLimiter } from './RateLimiter.js';
-import { SlidingLogRateLimiter } from './strategy/SlidingLog.js';
+import { SlidingLogRateLimiter } from './SlidingLog.js';
 
 const app = express();
 const port = 8000;

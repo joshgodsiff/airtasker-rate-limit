@@ -4,7 +4,7 @@ import {
   SlidingLogRateLimiter
 } from './SlidingLog.js';
 
-import { InMemoryStore } from '../store/InMemory.js';
+import { InMemoryStore } from './InMemory.js';
 
 describe("TokenBucket", () => {
   describe("rate limiting strategy", () => {

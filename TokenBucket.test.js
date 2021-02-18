@@ -4,7 +4,7 @@ import {
   _value
 } from './TokenBucket.js';
 
-import { InMemoryStore } from '../store/InMemory.js';
+import { InMemoryStore } from './InMemory.js';
 
 import assert from 'assert';
 
