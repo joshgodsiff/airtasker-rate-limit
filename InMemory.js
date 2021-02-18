@@ -14,15 +14,10 @@ function InMemoryStore() {
     return kvMap.set(id, value);
   }
 
-  function transaction(fn) {
-    return fn({has, get, set});
-  }
-
   return {
     has,
     get,
     set,
-    transaction
   }
 }
 

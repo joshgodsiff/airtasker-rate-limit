@@ -12,33 +12,23 @@ function cleanupOldEntries({time, window, log}) {
   return log;
 }
 
-function _rateLimiter({store, limit, window, id}) {
-  return store.transaction((t) => {
-    if (t.has(id)) {
-      const log = t.get(id);
-
-      const cleanedLog = cleanupOldEntries({time: new Date(), window, log})
-
-      if (cleanedLog.size() < limit) {
-        cleanedLog.enqueue(new Date());
-        t.set(id, cleanedLog)
-
-        return false;
-      } else {
-        t.set(id, cleanedLog);
-
-        return true;
-      }      
-    } else {
-      const q = new Queue();
-      q.enqueue(new Date());
-      t.set(id, q);
-      return limit <= 0;
-    }
-  });
-}
-
 // Public ---------------------------------------------------------------------
+
+const SlidingLogStrategy = {
+  getUpToDateValue: ({time, window, value}) => cleanupOldEntries({time, window, log: value}),
+  hasSpareCapacity: ({upToDateValue, limit}) => upToDateValue.size() < limit,
+  nextValueOnSuccess: ({upToDateValue, timestamp}) => {
+    upToDateValue.enqueue(timestamp)
+    return upToDateValue;
+  },
+  shouldSetOnLimit: true,
+  nextValueOnLimit: ({upToDateValue}) => upToDateValue,
+  freshValue: ({timestamp}) => {
+    const q = new Queue();
+    q.enqueue(timestamp);
+    return q;
+  }
+}
 
 function rateLimiter(store, limit, window) {
   return function(id) {
@@ -46,4 +36,7 @@ function rateLimiter(store, limit, window) {
   }
 }
 
-export { rateLimiter as SlidingLogRateLimiter }
+export {
+  rateLimiter as SlidingLogRateLimiter,
+  SlidingLogStrategy
+}
