@@ -4,7 +4,7 @@ import Queue from 'queue-fifo';
 import {
   _withinWindow,
   _cleanupOldEntries
-} from './SlidingLog.js';
+} from '../SlidingLog.js';
 
 describe("Sliding Log", () => {
   it("Should calculate whether a log entry is in a time window", () => {

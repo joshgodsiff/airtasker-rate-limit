@@ -1,9 +1,9 @@
 import {
   _tokensAvailable,
   _token
-} from './TokenBucket.js';
+} from '../TokenBucket.js';
 
-import { InMemoryStore } from './InMemory.js';
+import { InMemoryStore } from '../InMemory.js';
 
 import assert from 'assert';
 

@@ -17,6 +17,6 @@
   },
   "scripts": {
     "dev": "nodemon app.js",
-    "test": "mocha ./*.test.js"
+    "test": "mocha -p"
   }
 }

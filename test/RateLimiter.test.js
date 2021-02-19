@@ -1,10 +1,10 @@
 import assert from 'assert';
 
-import { SlidingLogStrategy } from './SlidingLog.js';
-import { TokenBucketStrategy } from './TokenBucket.js';
-import { RedisStore } from './Redis.js'
-import { InMemoryStore } from './InMemory.js';
-import { RateLimiter } from './RateLimiter.js';
+import { SlidingLogStrategy } from '../SlidingLog.js';
+import { TokenBucketStrategy } from '../TokenBucket.js';
+import { RedisStore } from '../Redis.js'
+import { InMemoryStore } from '../InMemory.js';
+import { RateLimiter } from '../RateLimiter.js';
 
 // The default config works on my system.
 // Documentation here: https://www.npmjs.com/package/redis#options-object-properties
