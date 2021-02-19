@@ -1,9 +1,13 @@
 import redis from 'redis';
 import util from 'util';
+import assert from 'assert';
+const { AbortError, AggregateError, ReplyError } = redis;
 
-function RedisStore(options) {
 
-  const client = redis.createClient(options);
+async function RedisStore(options, onError = () => {}) {
+
+  const client = await redis.createClient(options);
+  client.on("error", onError);
   const asyncGet = util.promisify(client.get).bind(client);
   const asyncExists = util.promisify(client.exists).bind(client);
   const asyncSet = util.promisify(client.set).bind(client);
