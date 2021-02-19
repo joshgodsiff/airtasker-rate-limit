@@ -26,6 +26,10 @@ The other main area that I'm not especially happy with is how the interface for 
 
 Also, I'm not *actually* very familiar with Node, I've just been writing a lot of front-end JS recently, so there might be some idiosyncrasies or things that don't line up with convention in terms of how I've structured this as a Node project.
 
+# Redis
+
+One of the options for a datastore is to use Redis, which obviously requires a Redis server to be running. `brew install redis` and running it with the default configuration worked for me, if you want to try it out. You'll also need to swap which store is used in `app.js`. If it can detect that Redis is running, some of the tests will also make use it.
+
 # Fun fact
 
 I think this is the first time I've actually written a `while` loop in about... 4 years? (Previous job was writing Haskell, which doesn't have loops built into the language.)
