@@ -12,7 +12,7 @@ This is a basic rate-limiting module in Node.
 
 I tried to keep it as composable as possible, so it's not tied to any particular server / framework. You could throw it into any old function call, and it would handle the rate-limiting just fine, although the response to the user as a result of being rate-limited is left up to the caller.
 
-Supplying an appropriate ID so that different callers can be distinguished is also left as an exercise for the caller.
+Supplying an appropriate ID so that different users can be distinguished is also left as an exercise for the caller.
 
 I tried to use a fairly functional style - although there's more mutable state drifting around than I'd like. Relatedly, the choice *not* to make use of JS's object-oriented features is also intentional. I'm quite happy to talk about that in an interview.
 
@@ -23,6 +23,8 @@ I implemented a couple of different strategies and a couple of different datasto
 The main area I know this can be improved is that it probably wouldn't handle multiple concurrent requests well (e.g. if you set it up in an AWS Lambda with a Redis backend or something), in the sense that it's currently possible to have two of these reading/writing the datastore at the same time, and there's no mechanism to ensure that that concurrency is handled correctly. Doing it probably wouldn't be too hard, but you'd have to integrate more tightly with something like Redis in order to take advantage of its concurrency and transaction primitives.
 
 The other main area that I'm not especially happy with is how the interface for the strategies turned out. I find it's always a balancing act between 'Don't repeat yourself' and 'Clear, readable code', and I think I fell a bit too far towards being DRY in that case.
+
+It doesn't have any sort of name-spacing of the keys/IDs right now, so if you wanted to have different things being rate limited and backed by the same datastore, something like that would need to be added - either that or table segregation at the datastore level.
 
 Also, I'm not *actually* very familiar with Node, I've just been writing a lot of front-end JS recently, so there might be some idiosyncrasies or things that don't line up with convention in terms of how I've structured this as a Node project.
 
