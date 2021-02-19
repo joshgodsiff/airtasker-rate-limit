@@ -8,14 +8,15 @@ import { SlidingLogStrategy } from './SlidingLog.js';
 const app = express();
 const port = 8000;
 
-const tenSeconds = new Date(0).setUTCSeconds(10); // Careful, this is a number, not a Date object.
+const oneHour = new Date(0).setUTCHours(1); // Careful, this is a number, not a Date object.
 
-const limiter = RateLimiter({store: InMemoryStore(), strategy: TokenBucketStrategy, limit: 5, window: tenSeconds});
+const limiter = RateLimiter({store: InMemoryStore(), strategy: SlidingLogStrategy, limit: 100, window: oneHour});
 
 app.get('/', (req, res) => {
-  const onLimit = () => {
+  const onLimit = (timeout) => {
     res.status(429);
-    res.send("Limited")
+    const seconds = timeout.getTime() / 1000;
+    res.send(`Rate limit exceeded. Try again in ${seconds} seconds`)
   }
 
   const onSuccess = () => {

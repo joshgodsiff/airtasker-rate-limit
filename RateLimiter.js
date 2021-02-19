@@ -15,13 +15,20 @@ async function genericRateLimiter({store, strategy, limit, window, id}) {
       await store.set(id, strategy.serialize(strategy.nextValueOnLimit({timestamp: now, upToDateValue, limit, window})))
     } // Else case deliberately omitted
 
-    return !hasSpareCapacity;
+    return {
+      limited: !hasSpareCapacity,
+      timeout: strategy.timeUntilNotLimited({upToDateValue, window, limit, time: now})
+    };
   } else {
+    const upToDateValue = strategy.freshValue({timestamp: now, limit, window})
     if (limit > 0) {
-      await store.set(id, strategy.serialize(strategy.freshValue({timestamp: now, limit, window})))
+      await store.set(id, strategy.serialize(upToDateValue))
     }
 
-    return limit <= 0;
+    return {
+      limited: limit <= 0,
+      timeout: strategy.timeUntilNotLimited({upToDateValue, window, limit, time: now})
+    };
   }
 }
 
@@ -38,15 +45,15 @@ function rateLimiterWithCb({store, strategy, limit, window}) {
   return async function(args) {
     const {id, onLimit, onSuccess} = {...defaults, ...args};
 
-    const isRateLimited = await genericRateLimiter({store, strategy, limit, window, id});
+    const {limited, timeout} = await genericRateLimiter({store, strategy, limit, window, id});
 
-    if (isRateLimited) {
-      onLimit();
+    if (limited) {
+      onLimit(timeout);
     } else {
       onSuccess();
     }
 
-    return isRateLimited;
+    return {limited, timeout};
   }
 }
 

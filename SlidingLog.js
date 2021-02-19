@@ -42,6 +42,10 @@ const SlidingLogStrategy = {
     const q = new Queue();
     parsed.map(e => q.enqueue(new Date(e)))
     return q;
+  },
+  timeUntilNotLimited: ({time, window, upToDateValue}) => {
+    const timeWindowDiff = time.getTime() - window;
+    return new Date(upToDateValue.peek().getTime() - timeWindowDiff);
   }
 }
 

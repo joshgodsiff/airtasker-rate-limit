@@ -43,6 +43,13 @@ const TokenBucketStrategy = {
   deserialize: (string) => {
     const parsed = JSON.parse(string)
     return _token({timestamp: new Date(parsed.timestamp), tokens: parsed.tokens})
+  },
+  timeUntilNotLimited: ({window, limit}) => {
+    if (limit <= 0) {
+      return "infinite";
+    } else {
+      return new Date(window / limit);
+    }
   }
 }
 
