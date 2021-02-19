@@ -1,8 +1,11 @@
+/*
+  A Redis-backed datastore, usable in the rate-limiting algorithm.
+
+  Unsurprisingly, won't work if there is no Redis server for it to connect to.
+*/
+
 import redis from 'redis';
 import util from 'util';
-import assert from 'assert';
-const { AbortError, AggregateError, ReplyError } = redis;
-
 
 async function RedisStore(options, onError = () => {}) {
 

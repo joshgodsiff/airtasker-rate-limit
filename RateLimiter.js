@@ -1,3 +1,9 @@
+/*
+  Rate limiting algorithm which can - in principle at least - make use of any
+  sort of rate-limiting strategy or KV data store that supports the requisite
+  interface.
+*/
+
 async function genericRateLimiter({store, strategy, limit, window, id}) {
   const now = new Date();
 
@@ -21,12 +27,13 @@ async function genericRateLimiter({store, strategy, limit, window, id}) {
     };
   } else {
     const upToDateValue = strategy.freshValue({timestamp: now, limit, window})
-    if (limit > 0) {
+    const limited = limit <= 0;
+    if (!limited) {
       await store.set(id, strategy.serialize(upToDateValue))
     }
 
     return {
-      limited: limit <= 0,
+      limited,
       timeout: strategy.timeUntilNotLimited({upToDateValue, window, limit, time: now})
     };
   }

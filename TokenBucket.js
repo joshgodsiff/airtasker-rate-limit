@@ -1,3 +1,12 @@
+/*
+  A Token Bucket strategy for rate limiting.
+  Each ID is assigned a configured number of 'tokens' that they may exchange
+  in order to make a successful request. Doing so decreases their current
+  number of tokens. If/when they run out of tokens, they must wait for the
+  tokens to replenish, at a rate of
+    one per (time_window / maximum_number_of_tokens)
+*/
+
 function _tokensAvailable({time, limit, window, value}) {
   // Divide by 0 check
   if (limit === 0 || time.getTime() === value.timestamp.getTime()) {

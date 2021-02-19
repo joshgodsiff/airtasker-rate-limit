@@ -1,3 +1,7 @@
+/*
+  A simple in-memory key-value datastore, usable in the rate-limiting algorithm.
+*/
+
 function InMemoryStore() {
 
   const kvMap = new Map();
